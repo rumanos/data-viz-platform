@@ -140,15 +140,16 @@ export function AuthForm({ mode, onModeChange, className, onAuthError, ...props 
     <form onSubmit={handleSubmit} className={cn('flex flex-col gap-6', className)} {...props} noValidate>
       <AnimatePresence mode="wait" initial={false}>
         <motion.div
+          layout
           key={mode}
-          initial={{ opacity: 0, y: 24 }}
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -24 }}
-          transition={{ duration: 0.15, ease: 'easeInOut' }}
+          exit={{ opacity: 0, y: -12 }}
+          transition={{ duration: 0.25, ease: 'easeInOut', type: 'spring' }}
         >
           <div className="flex flex-col items-center gap-2 text-center">
             <h1 className="text-2xl font-bold">
-              {mode === 'login' ? 'Login to your account' : 'Create your account'}
+              {mode === 'login' ? 'Welcome back' : 'Create your account'}
             </h1>
             <p className="text-balance text-sm text-muted-foreground">
               {mode === 'login'
