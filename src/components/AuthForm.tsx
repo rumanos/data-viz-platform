@@ -4,10 +4,11 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useState } from "react"
 import { signInWithEmailAndPassword, signInWithRedirect, GoogleAuthProvider, getRedirectResult } from 'firebase/auth'
-import { auth, getFirebaseAuthErrorMessage, signUpWithEmailAndPassword } from '../lib/firebase'
+import { auth, getFirebaseAuthErrorMessage, signUpWithEmailAndPassword, sendResetPasswordEmail } from '../lib/firebase'
 import { useNavigate } from 'react-router-dom'
 import { useEffect } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 
 type AuthMode = 'login' | 'signup';
 
@@ -30,6 +31,11 @@ export function AuthForm({ mode, onModeChange, className, onAuthError, ...props 
   const [formValues, setFormValues] = useState({ email: '', password: '', confirmPassword: '' });
   const [formErrors, setFormErrors] = useState<FormErrors>({});
   const navigate = useNavigate();
+  const [showResetDialog, setShowResetDialog] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
+  const [resetLoading, setResetLoading] = useState(false);
+  const [resetError, setResetError] = useState<string | null>(null);
+  const [resetSuccess, setResetSuccess] = useState<string | null>(null);
 
   const handleModeChange = (newMode: AuthMode) => {
     setFormValues(prev => ({
@@ -136,6 +142,40 @@ export function AuthForm({ mode, onModeChange, className, onAuthError, ...props 
     })
   }, [navigate])
 
+  const handleForgotPassword = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    setShowResetDialog(true);
+    setResetEmail(formValues.email || '');
+    setResetError(null);
+    setResetSuccess(null);
+  };
+
+  const handleResetEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setResetEmail(e.target.value);
+    setResetError(null);
+    setResetSuccess(null);
+  };
+
+  const handleSendResetEmail = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setResetLoading(true);
+    setResetError(null);
+    setResetSuccess(null);
+    if (!resetEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(resetEmail)) {
+      setResetError('Please enter a valid email address.');
+      setResetLoading(false);
+      return;
+    }
+    try {
+      await sendResetPasswordEmail(resetEmail);
+      setResetSuccess('Password reset email sent! Please check your inbox.');
+    } catch (err: any) {
+      setResetError(getFirebaseAuthErrorMessage(err.code || err.message || ''));
+    } finally {
+      setResetLoading(false);
+    }
+  };
+
   return (
     <form onSubmit={handleSubmit} className={cn('flex flex-col gap-6', className)} {...props} noValidate>
       <AnimatePresence mode="wait" initial={false}>
@@ -184,6 +224,7 @@ export function AuthForm({ mode, onModeChange, className, onAuthError, ...props 
                   <a
                     href="#"
                     className="ml-auto text-sm underline-offset-4 hover:underline"
+                    onClick={handleForgotPassword}
                   >
                     Forgot your password?
                   </a>
@@ -290,6 +331,36 @@ export function AuthForm({ mode, onModeChange, className, onAuthError, ...props 
           </div>
         </motion.div>
       </AnimatePresence>
+      <Dialog open={showResetDialog} onOpenChange={setShowResetDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Reset your password</DialogTitle>
+            <DialogDescription>
+              Enter your email address and we'll send you a password reset link.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleSendResetEmail} className="space-y-4">
+            <Input
+              id="resetEmail"
+              name="resetEmail"
+              type="email"
+              placeholder="m@example.com"
+              autoComplete="email"
+              value={resetEmail}
+              onChange={handleResetEmailChange}
+              required
+              disabled={resetLoading}
+            />
+            {resetError && <div className="text-xs text-destructive">{resetError}</div>}
+            {resetSuccess && <div className="text-xs text-green-600">{resetSuccess}</div>}
+            <DialogFooter>
+              <Button type="submit" disabled={resetLoading} className="w-full">
+                {resetLoading ? 'Sending...' : 'Send Reset Email'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </form>
   );
 }

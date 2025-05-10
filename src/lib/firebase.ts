@@ -1,5 +1,5 @@
 import { initializeApp, getApps } from 'firebase/app';
-import { getAuth, GoogleAuthProvider, signInWithPopup, createUserWithEmailAndPassword } from 'firebase/auth';
+import { getAuth, GoogleAuthProvider, signInWithPopup, createUserWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
 import type { FirebaseApp } from 'firebase/app';
 import type { Auth } from 'firebase/auth';
 
@@ -39,6 +39,19 @@ export async function signUpWithEmailAndPassword(email: string, password: string
   try {
     const result = await createUserWithEmailAndPassword(auth, email, password);
     return result;
+  } catch (error) {
+    throw error;
+  }
+}
+
+/**
+ * Sends a password reset email to the given email address using Firebase Auth.
+ * @param email The user's email address.
+ * @returns A promise that resolves when the email is sent.
+ */
+export async function sendResetPasswordEmail(email: string): Promise<void> {
+  try {
+    await sendPasswordResetEmail(auth, email);
   } catch (error) {
     throw error;
   }
