@@ -1,7 +1,7 @@
 ---
 description: 
 globs: 
-alwaysApply: false
+alwaysApply: true
 ---
 ---
 description: Enforces specific naming conventions for React and TypeScript code to maintain consistency.
