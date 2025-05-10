@@ -144,7 +144,7 @@ export function AuthForm({ mode, onModeChange, className, onAuthError, ...props 
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -24 }}
-          transition={{ duration: 0.35, ease: 'easeInOut' }}
+          transition={{ duration: 0.15, ease: 'easeInOut' }}
         >
           <div className="flex flex-col items-center gap-2 text-center">
             <h1 className="text-2xl font-bold">
@@ -153,7 +153,7 @@ export function AuthForm({ mode, onModeChange, className, onAuthError, ...props 
             <p className="text-balance text-sm text-muted-foreground">
               {mode === 'login'
                 ? 'Enter your email below to login to your account'
-                : 'Enter your email and password to create your account'}
+                : 'Enter your email and password to join'}
             </p>
           </div>
           <div className="grid gap-6 mt-6">
