@@ -19,13 +19,21 @@ const SidebarContext = createContext<SidebarContextProps>({ expanded: true });
 
 interface SidebarProps {
   children: ReactNode;
+  mobileOpen?: boolean;
+  onMobileClose?: () => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ children }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ children, mobileOpen, onMobileClose }) => {
   const [expanded, setExpanded] = useState(true);
 
   return (
-    <aside className="h-screen">
+    <aside
+      className={cn(
+        'h-screen z-40',
+        mobileOpen ? 'fixed top-0 left-0 w-64 md:static md:w-auto' : 'md:static'
+      )}
+      role="complementary"
+    >
       <nav className="h-full flex flex-col bg-background shadow-sm">
         <div className="p-4 pb-2 flex justify-between items-center">
           <Snail
@@ -44,6 +52,17 @@ export const Sidebar: React.FC<SidebarProps> = ({ children }) => {
           >
             {expanded ? <ChevronFirst /> : <ChevronLast />}
           </Button>
+          {mobileOpen && (
+            <Button
+              onClick={onMobileClose}
+              variant="ghost"
+              size="icon"
+              aria-label="Close sidebar"
+              className="md:hidden"
+            >
+              <ChevronFirst />
+            </Button>
+          )}
         </div>
         <SidebarContext.Provider value={{ expanded }}>
           <ul className="flex-1 px-3">{children}</ul>
@@ -71,20 +90,25 @@ export const Sidebar: React.FC<SidebarProps> = ({ children }) => {
 interface SidebarItemProps {
   icon: ReactNode;
   text: string;
-  active?: boolean;
   alert?: boolean;
+  selected?: boolean;
+  onClick?: () => void;
 }
 
-export const SidebarItem: React.FC<SidebarItemProps> = ({ icon, text, active, alert }) => {
+export const SidebarItem: React.FC<SidebarItemProps> = ({ icon, text, alert, selected, onClick }) => {
   const { expanded } = useContext(SidebarContext);
   const itemContent = (
     <li
       className={cn(
         'relative flex items-center py-2 px-3 my-1 font-medium rounded-md cursor-pointer transition-colors group',
-        active
+        selected
           ? 'bg-gradient-to-tr from-primary/20 to-primary/10 text-primary'
           : 'hover:bg-accent hover:text-accent-foreground text-muted-foreground'
       )}
+      onClick={onClick}
+      tabIndex={0}
+      role="button"
+      aria-current={selected ? 'page' : undefined}
     >
       {icon}
       <span className={cn('overflow-hidden transition-all', expanded ? 'w-52 ml-3' : 'w-0')}>{text}</span>
