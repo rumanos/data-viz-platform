@@ -1,15 +1,20 @@
 import { Snail } from "lucide-react"
-import { AuthForm } from "@/components/login-form"
+import { AuthForm } from "@/components/AuthForm"
 import { useAuthStore } from '../store/authStore'
 import { useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { FlickeringGrid } from "@/components/ui/flickering-grid";
-import Loader from '../components/ui/loader';
+import Loader from '../components/ui/Loader';
 
 export default function AuthPage() {
   const { user, loading: authLoading } = useAuthStore()
   const navigate = useNavigate()
   const location = useLocation()
+  const path = location.pathname.toLowerCase()
+  const validMode = path === '/signup' ? 'signup' : 'login'
+  const handleModeChange = (newMode: 'login' | 'signup') => {
+    navigate(`/${newMode}`)
+  }
 
   useEffect(() => {
     if (!authLoading && user) {
@@ -25,9 +30,6 @@ export default function AuthPage() {
     return null
   }
 
-  // Determine mode based on path
-  const mode = location.pathname === '/signup' ? 'signup' : 'login'
-
   return (
     <div className="grid min-h-svh lg:grid-cols-2">
       <div className="flex flex-col gap-4 p-6 md:p-10">
@@ -41,7 +43,7 @@ export default function AuthPage() {
         </div>
         <div className="flex flex-1 items-center justify-center">
           <div className="w-full max-w-xs">
-            <AuthForm mode={mode} />
+            <AuthForm mode={validMode} onModeChange={handleModeChange} />
           </div>
         </div>
       </div>

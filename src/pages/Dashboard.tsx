@@ -3,7 +3,7 @@ import { onAuthStateChanged } from 'firebase/auth';
 import type { User } from 'firebase/auth';
 import { auth } from '../lib/firebase';
 import { useNavigate } from 'react-router-dom';
-import Loader from '../components/ui/loader';
+import Loader from '../components/ui/Loader';
 
 const Dashboard: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
