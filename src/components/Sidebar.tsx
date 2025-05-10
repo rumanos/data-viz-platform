@@ -52,17 +52,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ children, mobileOpen, onMobile
           >
             {expanded ? <ChevronFirst /> : <ChevronLast />}
           </Button>
-          {mobileOpen && (
-            <Button
-              onClick={onMobileClose}
-              variant="ghost"
-              size="icon"
-              aria-label="Close sidebar"
-              className="md:hidden"
-            >
-              <ChevronFirst />
-            </Button>
-          )}
         </div>
         <SidebarContext.Provider value={{ expanded }}>
           <ul className="flex-1 px-3">{children}</ul>
