@@ -14,13 +14,14 @@ import {
   Calendar,
   LifeBuoy,
   Settings,
+  Gauge,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
 const SIDEBAR_MENUS = [
   { key: 'home', label: 'Home', icon: <Home size={18} />, alert: true },
-  { key: 'dashboard', label: 'Dashboard', icon: <Menu size={18} /> },
+  { key: 'dashboard', label: 'Dashboard', icon: <Gauge size={18} /> },
   { key: 'projects', label: 'Projects', icon: <StickyNote size={18} />, alert: true },
   { key: 'calendar', label: 'Calendar', icon: <Calendar size={18} /> },
   { key: 'tasks', label: 'Tasks', icon: <Layers size={18} /> },
