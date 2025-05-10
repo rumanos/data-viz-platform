@@ -25,3 +25,25 @@ const app: FirebaseApp = getApps().length ? getApps()[0] : initializeApp(firebas
 const auth: Auth = getAuth(app);
 
 export { app, auth };
+
+// Map Firebase Auth error codes to user-friendly messages
+export function getFirebaseAuthErrorMessage(errorCode: string): string {
+  switch (errorCode) {
+    case 'auth/invalid-email':
+      return 'The email address is badly formatted.';
+    case 'auth/user-disabled':
+      return 'This user account has been disabled.';
+    case 'auth/user-not-found':
+      return 'No account found with this email.';
+    case 'auth/wrong-password':
+      return 'Incorrect password. Please try again.';
+    case 'auth/too-many-requests':
+      return 'Too many failed attempts. Please try again later or reset your password.';
+    case 'auth/network-request-failed':
+      return 'Network error. Please check your connection and try again.';
+    case 'auth/internal-error':
+      return 'An internal error occurred. Please try again.';
+    default:
+      return 'Please check your credentials and try again.';
+  }
+}
