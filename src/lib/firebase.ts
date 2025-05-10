@@ -1,5 +1,5 @@
 import { initializeApp, getApps } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
+import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import type { FirebaseApp } from 'firebase/app';
 import type { Auth } from 'firebase/auth';
 
@@ -23,6 +23,19 @@ const firebaseConfig: FirebaseConfig = {
 
 const app: FirebaseApp = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
 const auth: Auth = getAuth(app);
+
+const googleProvider = new GoogleAuthProvider();
+
+export async function signInWithGoogle() {
+  try {
+    const result = await signInWithPopup(auth, googleProvider);
+    return result;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export { GoogleAuthProvider };
 
 export { app, auth };
 
