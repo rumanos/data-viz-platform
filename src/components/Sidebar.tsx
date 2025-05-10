@@ -42,7 +42,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ children, mobileOpen, onMobile
               expanded ? 'w-6 h-6' : 'w-0 h-8'
             )}
           />
-          <Button
+          {
+            !mobileOpen &&  <Button
             onClick={() => setExpanded((curr) => !curr)}
             variant="ghost"
             size="icon"
@@ -51,7 +52,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ children, mobileOpen, onMobile
             className="shrink-0"
           >
             {expanded ? <ChevronFirst /> : <ChevronLast />}
-          </Button>
+          </Button>}
         </div>
         <SidebarContext.Provider value={{ expanded }}>
           <ul className="flex-1 px-3">{children}</ul>
