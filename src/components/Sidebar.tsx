@@ -5,7 +5,7 @@ import {
   ChevronLast,
   MoreVertical,
   User,
-  BarChart3,
+  Snail,
 } from 'lucide-react';
 import { Button } from './ui/button';
 import { Tooltip, TooltipTrigger, TooltipContent } from './ui/tooltip';
@@ -26,12 +26,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ children }) => {
 
   return (
     <aside className="h-screen">
-      <nav className="h-full flex flex-col bg-background border-r shadow-sm">
+      <nav className="h-full flex flex-col bg-background shadow-sm">
         <div className="p-4 pb-2 flex justify-between items-center">
-          <BarChart3
+          <Snail
             className={cn(
               'text-primary transition-all',
-              expanded ? 'w-8 h-8' : 'w-0 h-8'
+              expanded ? 'w-6 h-6' : 'w-0 h-8'
             )}
           />
           <Button
@@ -57,10 +57,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ children }) => {
             )}
           >
             <div className="leading-4">
-              <h4 className="font-semibold">constGenius</h4>
-              <span className="text-xs text-muted-foreground">constgenius@gmail.com</span>
+              <h4 className="font-semibold">username</h4>
+              <span className="text-xs text-muted-foreground">m@example.com</span>
             </div>
-            <MoreVertical size={20} />
+            <MoreVertical size={18} />
           </div>
         </div>
       </nav>

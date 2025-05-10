@@ -15,6 +15,7 @@ import {
   LifeBuoy,
   Settings,
 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 const Dashboard: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -45,25 +46,31 @@ const Dashboard: React.FC = () => {
   return (
     <div className="flex min-h-screen">
       <Sidebar>
-        <SidebarItem icon={<Home size={20} />} text="Home" alert />
-        <SidebarItem icon={<LayoutDashboard size={20} />} text="Dashboard" active />
-        <SidebarItem icon={<StickyNote size={20} />} text="Projects" alert />
-        <SidebarItem icon={<Calendar size={20} />} text="Calendar" />
-        <SidebarItem icon={<Layers size={20} />} text="Tasks" />
-        <SidebarItem icon={<Flag size={20} />} text="Reporting" />
+        <SidebarItem icon={<Home size={18} />} text="Home" alert />
+        <SidebarItem icon={<LayoutDashboard size={18} />} text="Dashboard" active />
+        <SidebarItem icon={<StickyNote size={18} />} text="Projects" alert />
+        <SidebarItem icon={<Calendar size={18} />} text="Calendar" />
+        <SidebarItem icon={<Layers size={18} />} text="Tasks" />
+        <SidebarItem icon={<Flag size={18} />} text="Reporting" />
         <hr className="my-3" />
-        <SidebarItem icon={<Settings size={20} />} text="Settings" />
-        <SidebarItem icon={<LifeBuoy size={20} />} text="Help" />
+        <SidebarItem icon={<Settings size={18} />} text="Settings" />
+        <SidebarItem icon={<LifeBuoy size={18} />} text="Help" />
       </Sidebar>
       <main className="flex-1 flex flex-col items-center justify-center">
+        <header className="flex flex-col items-center justify-center h-16">
+          
+        </header>
+        <div className="flex flex-col items-center justify-center bg-neutral-900 w-full h-full rounded-tl-lg">
         <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
         <p className="text-gray-600 mb-4">Welcome, {user?.email}!</p>
-        <button
+        <Button
           onClick={handleLogout}
-          className="btn btn-destructive mt-4"
+          className="mt-4"
         >
           Logout
-        </button>
+        </Button>
+        </div>
+        
       </main>
     </div>
   );
