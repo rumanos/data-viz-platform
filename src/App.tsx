@@ -2,7 +2,7 @@ import { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
 import ProtectedRoute from './components/ProtectedRoute';
-import Loader from './components/ui/Loader';
+import Loader from './components/ui/loader';
 const Home = lazy(() => import('./pages/Home'));
 const AuthPage = lazy(() => import('./pages/Login'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));

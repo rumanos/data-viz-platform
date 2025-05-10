@@ -4,7 +4,7 @@ import { useAuthStore } from '../store/authStore'
 import { useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { FlickeringGrid } from "@/components/ui/flickering-grid";
-import Loader from '../components/ui/Loader';
+import Loader from '../components/ui/loader';
 
 export default function AuthPage() {
   const { user, loading: authLoading } = useAuthStore()
