@@ -60,7 +60,7 @@ const Dashboard: React.FC = () => {
         <header className="flex flex-col items-center justify-center h-16">
           
         </header>
-        <div className="flex flex-col items-center justify-center bg-neutral-900 w-full h-full rounded-tl-lg">
+        <div className="flex flex-col items-center justify-center border-t border-l border-[#525252] bg-[#161618] w-full h-full rounded-tl-lg">
         <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
         <p className="text-gray-600 mb-4">Welcome, {user?.email}!</p>
         <Button
