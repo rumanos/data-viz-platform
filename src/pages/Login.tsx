@@ -1,14 +1,15 @@
 import { Snail } from "lucide-react"
-import { LoginForm } from "@/components/login-form"
+import { AuthForm } from "@/components/login-form"
 import { useAuthStore } from '../store/authStore'
 import { useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { FlickeringGrid } from "@/components/ui/flickering-grid";
+import Loader from '../components/ui/loader';
 
-
-export default function LoginPage() {
+export default function AuthPage() {
   const { user, loading: authLoading } = useAuthStore()
   const navigate = useNavigate()
+  const location = useLocation()
 
   useEffect(() => {
     if (!authLoading && user) {
@@ -17,12 +18,15 @@ export default function LoginPage() {
   }, [authLoading, user, navigate])
 
   if (authLoading) {
-    return <div className="flex items-center justify-center min-h-screen">Loading...</div>
+    return <Loader />
   }
 
   if (user) {
     return null
   }
+
+  // Determine mode based on path
+  const mode = location.pathname === '/signup' ? 'signup' : 'login'
 
   return (
     <div className="grid min-h-svh lg:grid-cols-2">
@@ -37,7 +41,7 @@ export default function LoginPage() {
         </div>
         <div className="flex flex-1 items-center justify-center">
           <div className="w-full max-w-xs">
-            <LoginForm />
+            <AuthForm mode={mode} />
           </div>
         </div>
       </div>

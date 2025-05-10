@@ -3,6 +3,7 @@ import { onAuthStateChanged } from 'firebase/auth';
 import type { User } from 'firebase/auth';
 import { auth } from '../lib/firebase';
 import { useNavigate } from 'react-router-dom';
+import Loader from '../components/ui/loader';
 
 const Dashboard: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -22,7 +23,7 @@ const Dashboard: React.FC = () => {
   }, [navigate]);
 
   if (loading) {
-    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
+    return <Loader />;
   }
 
   const handleLogout = async () => {

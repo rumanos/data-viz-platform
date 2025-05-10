@@ -8,6 +8,7 @@ const Home: React.FC = () => {
       <p className="text-lg text-gray-600 mb-8">Your home for data visualization.</p>
       <div className="flex gap-4">
         <Link to="/login" className="btn btn-primary">Login</Link>
+        <Link to="/signup" className="btn btn-accent">Sign Up</Link>
         <Link to="/dashboard" className="btn btn-secondary">Dashboard</Link>
       </div>
     </div>

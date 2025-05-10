@@ -4,47 +4,55 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useState } from "react"
 import { signInWithEmailAndPassword, signInWithRedirect, GoogleAuthProvider, getRedirectResult } from 'firebase/auth'
-import { auth, getFirebaseAuthErrorMessage } from '../lib/firebase'
+import { auth, getFirebaseAuthErrorMessage, signUpWithEmailAndPassword } from '../lib/firebase'
 import { useNavigate } from 'react-router-dom'
 import { useEffect } from 'react'
 
-interface LoginFormProps extends React.ComponentPropsWithoutRef<"form"> {
-  onLoginError?: (error: string) => void
+type AuthMode = 'login' | 'signup';
+
+interface AuthFormProps extends React.ComponentPropsWithoutRef<'form'> {
+  mode: AuthMode;
+  onAuthError?: (error: string) => void;
 }
 
 interface FormErrors {
   email?: string;
   password?: string;
+  confirmPassword?: string;
   general?: string;
 }
 
-export function LoginForm({
-  className,
-  onLoginError,
-  ...props
-}: LoginFormProps) {
-  const [loading, setLoading] = useState(false)
-  const [googleLoading, setGoogleLoading] = useState(false)
-  const [formValues, setFormValues] = useState({ email: '', password: '' })
-  const [formErrors, setFormErrors] = useState<FormErrors>({})
-  const navigate = useNavigate()
+export function AuthForm({ mode, className, onAuthError, ...props }: AuthFormProps) {
+  const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
+  const [formValues, setFormValues] = useState({ email: '', password: '', confirmPassword: '' });
+  const [formErrors, setFormErrors] = useState<FormErrors>({});
+  const navigate = useNavigate();
 
   const validate = (values: typeof formValues): FormErrors => {
-    const errors: FormErrors = {}
+    const errors: FormErrors = {};
     // Email validation
     if (!values.email) {
-      errors.email = 'Email is required.'
+      errors.email = 'Email is required.';
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email)) {
-      errors.email = 'Please enter a valid email address.'
+      errors.email = 'Please enter a valid email address.';
     }
     // Password validation
     if (!values.password) {
-      errors.password = 'Password is required.'
+      errors.password = 'Password is required.';
     } else if (values.password.length < 6) {
-      errors.password = 'Password must be at least 6 characters.'
+      errors.password = 'Password must be at least 6 characters.';
     }
-    return errors
-  }
+    if (mode === 'signup') {
+      // Confirm password validation
+      if (!values.confirmPassword) {
+        errors.confirmPassword = 'Please confirm your password.';
+      } else if (values.password !== values.confirmPassword) {
+        errors.confirmPassword = 'Passwords do not match.';
+      }
+    }
+    return errors;
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -59,25 +67,29 @@ export function LoginForm({
   }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setLoading(true)
-    const errors = validate(formValues)
-    setFormErrors(errors)
+    e.preventDefault();
+    setLoading(true);
+    const errors = validate(formValues);
+    setFormErrors(errors);
     if (Object.keys(errors).length > 0) {
-      setLoading(false)
-      return
+      setLoading(false);
+      return;
     }
     try {
-      await signInWithEmailAndPassword(auth, formValues.email, formValues.password)
-      navigate('/dashboard')
+      if (mode === 'login') {
+        await signInWithEmailAndPassword(auth, formValues.email, formValues.password);
+      } else {
+        await signUpWithEmailAndPassword(formValues.email, formValues.password);
+      }
+      navigate('/dashboard');
     } catch (err: any) {
-      const errorMsg = getFirebaseAuthErrorMessage(err.code || err.message || '')
-      setFormErrors((prev) => ({ ...prev, general: errorMsg }))
-      onLoginError?.(errorMsg)
+      const errorMsg = getFirebaseAuthErrorMessage(err.code || err.message || '');
+      setFormErrors((prev) => ({ ...prev, general: errorMsg }));
+      onAuthError?.(errorMsg);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleGoogleSignIn = async () => {
     setGoogleLoading(true)
@@ -86,11 +98,11 @@ export function LoginForm({
       const provider = new GoogleAuthProvider()
       await signInWithRedirect(auth, provider)
       // Note: The redirect will happen here, so the code below won't execute
-      // The auth state change will be handled by your app's auth listener
+      // The auth state change will be handled by the app's auth listener
     } catch (err: any) {
       const errorMsg = getFirebaseAuthErrorMessage(err.code || err.message || '')
       setFormErrors((prev) => ({ ...prev, general: errorMsg }))
-      onLoginError?.(errorMsg)
+      onAuthError?.(errorMsg)
     } finally {
       setGoogleLoading(false)
     }
@@ -109,11 +121,15 @@ export function LoginForm({
   }, [navigate])
 
   return (
-    <form onSubmit={handleSubmit} className={cn("flex flex-col gap-6", className)} {...props} noValidate>
+    <form onSubmit={handleSubmit} className={cn('flex flex-col gap-6', className)} {...props} noValidate>
       <div className="flex flex-col items-center gap-2 text-center">
-        <h1 className="text-2xl font-bold">Login to your account</h1>
+        <h1 className="text-2xl font-bold">
+          {mode === 'login' ? 'Login to your account' : 'Create your account'}
+        </h1>
         <p className="text-balance text-sm text-muted-foreground">
-          Enter your email below to login to your account
+          {mode === 'login'
+            ? 'Enter your email below to login to your account'
+            : 'Enter your email and password to create your account'}
         </p>
       </div>
       <div className="grid gap-6">
@@ -139,18 +155,20 @@ export function LoginForm({
         <div className="grid gap-2">
           <div className="flex items-center">
             <Label htmlFor="password">Password</Label>
-            <a
-              href="#"
-              className="ml-auto text-sm underline-offset-4 hover:underline"
-            >
-              Forgot your password?
-            </a>
+            {mode === 'login' && (
+              <a
+                href="#"
+                className="ml-auto text-sm underline-offset-4 hover:underline"
+              >
+                Forgot your password?
+              </a>
+            )}
           </div>
           <Input
             id="password"
             name="password"
             type="password"
-            autoComplete="current-password"
+            autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
             value={formValues.password}
             onChange={handleChange}
             onBlur={handleBlur}
@@ -162,11 +180,37 @@ export function LoginForm({
             <span id="password-error" className="text-xs text-destructive mt-1">{formErrors.password}</span>
           )}
         </div>
+        {mode === 'signup' && (
+          <div className="grid gap-2">
+            <Label htmlFor="confirmPassword">Confirm Password</Label>
+            <Input
+              id="confirmPassword"
+              name="confirmPassword"
+              type="password"
+              autoComplete="new-password"
+              value={formValues.confirmPassword}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              aria-invalid={!!formErrors.confirmPassword}
+              aria-describedby={formErrors.confirmPassword ? 'confirmPassword-error' : undefined}
+              required
+            />
+            {formErrors.confirmPassword && (
+              <span id="confirmPassword-error" className="text-xs text-destructive mt-1">{formErrors.confirmPassword}</span>
+            )}
+          </div>
+        )}
         {formErrors.general && (
           <div className="text-xs text-destructive text-start">{formErrors.general}</div>
         )}
         <Button type="submit" className="w-full" disabled={loading}>
-          {loading ? 'Signing in...' : 'Login'}
+          {loading
+            ? mode === 'login'
+              ? 'Signing in...'
+              : 'Signing up...'
+            : mode === 'login'
+              ? 'Login'
+              : 'Sign Up'}
         </Button>
         <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
           <span className="relative z-10 bg-background px-2 text-muted-foreground">
@@ -180,15 +224,35 @@ export function LoginForm({
               fill="currentColor"
             />
           </svg>
-          {googleLoading ? 'Signing in with Google...' : 'Continue with Google'}
+          {googleLoading
+            ? mode === 'login'
+              ? 'Signing in with Google...'
+              : 'Signing up with Google...'
+            : 'Continue with Google'}
         </Button>
       </div>
       <div className="text-center text-sm">
-        Don&apos;t have an account?{" "}
-        <a href="#" className="underline underline-offset-4">
-          Sign up
-        </a>
+        {mode === 'login' ? (
+          <>
+            Don&apos;t have an account?{' '}
+            <a href="/signup" className="underline underline-offset-4">
+              Sign up
+            </a>
+          </>
+        ) : (
+          <>
+            Already have an account?{' '}
+            <a href="/login" className="underline underline-offset-4">
+              Login
+            </a>
+          </>
+        )}
       </div>
     </form>
-  )
+  );
+}
+
+// For backward compatibility, export LoginForm as AuthForm in login mode
+export function LoginForm(props: Omit<AuthFormProps, 'mode'>) {
+  return <AuthForm mode="login" {...props} />;
 }
