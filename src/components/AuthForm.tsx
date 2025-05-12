@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useState, useCallback, useEffect } from "react"
 import { signInWithEmailAndPassword, signInWithRedirect, GoogleAuthProvider, getRedirectResult } from 'firebase/auth'
-import { auth, getFirebaseAuthErrorMessage, signUpWithEmailAndPassword, sendResetPasswordEmail } from '../lib/firebase'
+import { auth, getFirebaseAuthErrorMessage, signUpWithEmailAndPassword, sendResetPasswordEmail, signInWithGoogle } from '../lib/firebase'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'motion/react'
 
@@ -124,14 +124,13 @@ export function AuthForm({ mode, onModeChange, className, onAuthError, ...props 
     setGoogleLoading(true);
     setFormErrors((prev) => ({ ...prev, general: undefined }));
     try {
-      const provider = new GoogleAuthProvider();
-      await signInWithRedirect(auth, provider);
-      // Redirect will occur here
+      await signInWithGoogle();
+      navigate('/');
     } catch (err: unknown) {
       let errorCode = 'unknown-error';
       let errorMessage = 'An unexpected error occurred.';
 
-       if (typeof err === 'object' && err !== null) {
+      if (typeof err === 'object' && err !== null) {
         if ('code' in err) errorCode = String((err as {code: unknown}).code);
         if ('message' in err) errorMessage = String((err as {message: unknown}).message);
       } else if (err instanceof Error) {
@@ -144,7 +143,7 @@ export function AuthForm({ mode, onModeChange, className, onAuthError, ...props 
     } finally {
       setGoogleLoading(false);
     }
-  }, [onAuthError]);
+  }, [onAuthError, navigate]);
 
   useEffect(() => {
     getRedirectResult(auth).then((result) => {
@@ -315,11 +314,11 @@ export function AuthForm({ mode, onModeChange, className, onAuthError, ...props 
                 <Label htmlFor="password">Password</Label>
                 {mode === 'login' && (
                   <a
-                    href="#"
-                    className="ml-auto text-sm underline-offset-4 hover:underline"
+                    href="/reset-password"
+                    className="ml-auto text-sm underline-offset-4 hover:underline text-primary/70 underline"
                     onClick={handleresetPassword}
                   >
-                    Forgot your password?
+                    Forgot password?
                   </a>
                 )}
               </div>
