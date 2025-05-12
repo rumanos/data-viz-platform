@@ -1,8 +1,12 @@
 import { Snail } from "lucide-react"
 import { AuthForm } from "@/components/AuthForm"
+import { useAuthStore } from "@/store/authStore"
+import { useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
+import Loader from '../components/ui/loader';
 
 export default function AuthPage() {
+  const { user, loading: authLoading } = useAuthStore()
   const navigate = useNavigate()
   const location = useLocation()
   const path = location.pathname.toLowerCase()
@@ -18,6 +22,19 @@ export default function AuthPage() {
     }
   }
 
+  useEffect(() => {
+    if (!authLoading && user) {
+      navigate('/', { replace: true })
+    }
+  }, [authLoading, user, navigate])
+
+  if (authLoading) {
+    return <Loader />
+  }
+
+  if (user) {
+    return null
+  }
 
   return (
     <div className="grid min-h-svh lg:grid-cols-2">
