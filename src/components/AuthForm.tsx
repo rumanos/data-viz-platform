@@ -76,7 +76,19 @@ function GoogleButton({ loading, mode, onClick }: { loading: boolean, mode: Auth
   );
 }
 
-function EmailInput({ value, onChange, onBlur, error, disabled }: { value: string, onChange: any, onBlur: any, error?: string, disabled?: boolean }) {
+function EmailInput({
+  value,
+  onChange,
+  onBlur,
+  error,
+  disabled,
+}: {
+  value: string,
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void,
+  onBlur: (e: React.FocusEvent<HTMLInputElement>) => void,
+  error?: string,
+  disabled?: boolean
+}) {
   return (
     <div className="grid gap-2">
       <Label htmlFor="email">Email</Label>
