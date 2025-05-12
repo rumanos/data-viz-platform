@@ -150,14 +150,7 @@ function PasswordInput({ value, onChange, onBlur, error, disabled, mode, onForgo
 
 function ConfirmPasswordInput({ value, onChange, onBlur, error, disabled }: { value: string, onChange: any, onBlur: any, error?: string, disabled?: boolean }) {
   return (
-    <motion.div
-      key="confirmPassword"
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -16 }}
-      transition={{ duration: 0.25, ease: 'easeInOut' }}
-      className="grid gap-2"
-    >
+    <div className="grid gap-2">
       <Label htmlFor="confirmPassword">Confirm Password</Label>
       <Input
         id="confirmPassword"
@@ -175,7 +168,7 @@ function ConfirmPasswordInput({ value, onChange, onBlur, error, disabled }: { va
       {error && (
         <span id="confirmPassword-error" className="text-xs text-destructive mt-1">{error}</span>
       )}
-    </motion.div>
+    </div>
   );
 }
 
@@ -190,52 +183,42 @@ function ResetPasswordForm({ resetEmail, resetLoading, resetError, resetSuccess,
 }) {
   return (
     <form onSubmit={onSubmit} className={cn('flex flex-col gap-6')} noValidate>
-      <AnimatePresence mode="wait" initial={false}>
-        <motion.div
-          layout
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -12 }}
-          transition={{ duration: 0.25, ease: 'easeInOut', type: 'spring' }}
+      <div className="flex flex-col items-center gap-2 text-center">
+        <h1 className="text-2xl font-bold">Reset your password</h1>
+        <p className="text-balance text-sm text-muted-foreground">
+          Enter your email address and we'll send you a password reset link.
+        </p>
+      </div>
+      <div className="grid gap-6 mt-6">
+        <div className="grid gap-2">
+          <Label htmlFor="resetEmail">Email</Label>
+          <Input
+            id="resetEmail"
+            name="resetEmail"
+            type="email"
+            placeholder="m@example.com"
+            autoComplete="email"
+            value={resetEmail}
+            onChange={onChange}
+            required
+            disabled={resetLoading}
+          />
+          {resetError && <div className="text-xs text-destructive mt-1">{resetError}</div>}
+          {resetSuccess && <div className="text-xs text-green-600 mt-1">{resetSuccess}</div>}
+        </div>
+        <Button type="submit" disabled={resetLoading} className="w-full">
+          {resetLoading ? 'Sending...' : 'Send Reset Email'}
+        </Button>
+      </div>
+      <div className="text-center text-sm mt-6">
+        <button
+          type="button"
+          onClick={onBack}
+          className="underline underline-offset-4 cursor-pointer"
         >
-          <div className="flex flex-col items-center gap-2 text-center">
-            <h1 className="text-2xl font-bold">Reset your password</h1>
-            <p className="text-balance text-sm text-muted-foreground">
-              Enter your email address and we'll send you a password reset link.
-            </p>
-          </div>
-          <div className="grid gap-6 mt-6">
-            <div className="grid gap-2">
-              <Label htmlFor="resetEmail">Email</Label>
-              <Input
-                id="resetEmail"
-                name="resetEmail"
-                type="email"
-                placeholder="m@example.com"
-                autoComplete="email"
-                value={resetEmail}
-                onChange={onChange}
-                required
-                disabled={resetLoading}
-              />
-              {resetError && <div className="text-xs text-destructive mt-1">{resetError}</div>}
-              {resetSuccess && <div className="text-xs text-green-600 mt-1">{resetSuccess}</div>}
-            </div>
-            <Button type="submit" disabled={resetLoading} className="w-full">
-              {resetLoading ? 'Sending...' : 'Send Reset Email'}
-            </Button>
-          </div>
-          <div className="text-center text-sm mt-6">
-            <button
-              type="button"
-              onClick={onBack}
-              className="underline underline-offset-4 cursor-pointer"
-            >
-              Back to Login
-            </button>
-          </div>
-        </motion.div>
-      </AnimatePresence>
+          Back to Login
+        </button>
+      </div>
     </form>
   );
 }
@@ -395,104 +378,109 @@ export function AuthForm({ mode, onModeChange, className, onAuthError, ...props 
     }
   }, [resetEmail]);
 
-  if (mode === 'resetPassword') {
-    return (
-      <ResetPasswordForm
-        resetEmail={resetEmail}
-        resetLoading={resetLoading}
-        resetError={resetError}
-        resetSuccess={resetSuccess}
-        onChange={handleResetEmailChange}
-        onSubmit={handleSendResetEmail}
-        onBack={() => onModeChange('login')}
-      />
-    );
-  }
+  // Define common animation properties
+  const animationProps = {
+    layout: true,
+    initial: { opacity: 0, y: 12 },
+    animate: { opacity: 1, y: 0 },
+    exit: { opacity: 0, y: -12 },
+    transition: { duration: 0.25, ease: 'easeInOut', type: 'spring' },
+  };
 
+  // Use a single AnimatePresence wrapping the conditional rendering
   return (
-    <form onSubmit={handleSubmit} className={cn('flex flex-col gap-6', className)} {...props} noValidate>
-      <AnimatePresence mode="wait" initial={false}>
-        <motion.div
-          layout
-          key={mode}
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -12 }}
-          transition={{ duration: 0.25, ease: 'easeInOut', type: 'spring' }}
-        >
-          <FormHeader mode={mode} />
-          <div className="grid gap-6 mt-6">
-            <GoogleButton loading={loading || googleLoading} mode={mode} onClick={handleGoogleSignIn} />
-            <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
-              <span className="relative z-10 bg-background px-2 text-muted-foreground">
-                Or continue with
-              </span>
-            </div>
-            <EmailInput
-              value={formValues.email}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              error={formErrors.email}
-              disabled={loading}
-            />
-            <PasswordInput
-              value={formValues.password}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              error={formErrors.password}
-              disabled={loading}
-              mode={mode}
-              onForgot={handleresetPassword}
-            />
-            {mode === 'signup' && (
-              <ConfirmPasswordInput
-                value={formValues.confirmPassword}
+    <AnimatePresence mode="wait" initial={false}>
+      {mode === 'resetPassword' ? (
+        // Motion div for reset password mode
+        <motion.div key="resetPassword" {...animationProps}>
+          <ResetPasswordForm
+            resetEmail={resetEmail}
+            resetLoading={resetLoading}
+            resetError={resetError}
+            resetSuccess={resetSuccess}
+            onChange={handleResetEmailChange}
+            onSubmit={handleSendResetEmail}
+            onBack={() => handleModeChange('login')} // Use handleModeChange
+          />
+        </motion.div>
+      ) : (
+        // Motion div for login/signup modes
+        <motion.div key={mode} {...animationProps}>
+          <form onSubmit={handleSubmit} className={cn('flex flex-col gap-6', className)} {...props} noValidate>
+            <FormHeader mode={mode} />
+            <div className="grid gap-6 mt-6">
+              <GoogleButton loading={loading || googleLoading} mode={mode} onClick={handleGoogleSignIn} />
+              <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
+                <span className="relative z-10 bg-background px-2 text-muted-foreground">
+                  Or continue with
+                </span>
+              </div>
+              <EmailInput
+                value={formValues.email}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                error={formErrors.confirmPassword}
+                error={formErrors.email}
                 disabled={loading}
               />
-            )}
-            {formErrors.general && (
-              <div className="text-xs text-destructive text-start">{formErrors.general}</div>
-            )}
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading
-                ? mode === 'login'
-                  ? 'Signing in...'
-                  : 'Signing up...'
-                : mode === 'login'
-                  ? 'Login'
-                  : 'Sign Up'}
-            </Button>
-          </div>
-          <div className="text-center text-sm mt-6">
-            {mode === 'login' ? (
-              <>
-                Don&apos;t have an account?{' '}
-                <button
-                  type="button"
-                  onClick={() => handleModeChange('signup')}
-                  className="underline underline-offset-4 cursor-pointer"
-                >
-                  Sign up
-                </button>
-              </>
-            ) : (
-              <>
-                Already have an account?{' '}
-                <button
-                  type="button"
-                  onClick={() => handleModeChange('login')}
-                  className="underline underline-offset-4 cursor-pointer"
-                >
-                  Login
-                </button>
-              </>
-            )}
-          </div>
+              <PasswordInput
+                value={formValues.password}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={formErrors.password}
+                disabled={loading}
+                mode={mode}
+                onForgot={handleresetPassword}
+              />
+              {mode === 'signup' && (
+                <ConfirmPasswordInput
+                  value={formValues.confirmPassword}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  error={formErrors.confirmPassword}
+                  disabled={loading}
+                />
+              )}
+              {formErrors.general && (
+                <div className="text-xs text-destructive text-start">{formErrors.general}</div>
+              )}
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading
+                  ? mode === 'login'
+                    ? 'Signing in...'
+                    : 'Signing up...'
+                  : mode === 'login'
+                    ? 'Login'
+                    : 'Sign Up'}
+              </Button>
+            </div>
+            <div className="text-center text-sm mt-6">
+              {mode === 'login' ? (
+                <>
+                  Don&apos;t have an account?{' '}
+                  <button
+                    type="button"
+                    onClick={() => handleModeChange('signup')}
+                    className="underline underline-offset-4 cursor-pointer"
+                  >
+                    Sign up
+                  </button>
+                </>
+              ) : (
+                <>
+                  Already have an account?{' '}
+                  <button
+                    type="button"
+                    onClick={() => handleModeChange('login')}
+                    className="underline underline-offset-4 cursor-pointer"
+                  >
+                    Login
+                  </button>
+                </>
+              )}
+            </div>
+          </form>
         </motion.div>
-      </AnimatePresence>
-    </form>
+      )}
+    </AnimatePresence>
   );
 }
