@@ -1,0 +1,15 @@
+/* Customize the selection color */
+::selection {
+  background: var(--color-lime-200, #b3d4fc); /* fallback color */
+  color: var(--color-accent, #222); /* fallback color */
+}
+
+/* Customize the autofill color */
+input:-webkit-autofill,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+  background-color: var(--color-muted, #f0f0f0) !important;
+  -webkit-box-shadow: 0 0 0 1000px var(--color-muted, #f0f0f0) inset !important;
+  -webkit-text-fill-color: var(--color-foreground, #222) !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
