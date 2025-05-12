@@ -259,8 +259,10 @@ export function AuthForm({ mode, onModeChange, className, onAuthError, ...props 
     }));
     setFormErrors(prev => ({
       ...prev,
+      email: undefined,
       password: undefined,
-      confirmPassword: undefined
+      confirmPassword: undefined,
+      general: undefined
     }));
     onModeChange(newMode);
   }, [onModeChange]);
@@ -355,6 +357,7 @@ export function AuthForm({ mode, onModeChange, className, onAuthError, ...props 
     setResetEmail(formValues.email || '');
     setResetError(null);
     setResetSuccess(null);
+    setFormErrors({});
     onModeChange('resetPassword');
   }, [formValues.email, onModeChange]);
 
