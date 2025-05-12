@@ -23,7 +23,7 @@ interface FormErrors {
   general?: string;
 }
 
-// Utility: Validation
+// Validates email, password, and confirm password based on the current authentication mode.
 function validateAuthForm(values: { email: string; password: string; confirmPassword?: string }, mode: AuthMode): FormErrors {
   const errors: FormErrors = {};
   if (!values.email) {
@@ -223,6 +223,10 @@ function ResetPasswordForm({ resetEmail, resetLoading, resetError, resetSuccess,
   );
 }
 
+// Main component for the authentication form.
+// Handles different modes: login, signup, and resetPassword.
+// Manages form state, validation, submission, and error handling.
+// Integrates with Firebase for authentication.
 export function AuthForm({ mode, onModeChange, className, onAuthError, ...props }: AuthFormProps) {
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
@@ -235,6 +239,7 @@ export function AuthForm({ mode, onModeChange, className, onAuthError, ...props 
   const [resetSuccess, setResetSuccess] = useState<string | null>(null);
 
   const handleModeChange = useCallback((newMode: AuthMode) => {
+    // Reset password and confirmPassword fields when changing mode
     setFormValues(prev => ({
       ...prev,
       password: '',
@@ -262,6 +267,13 @@ export function AuthForm({ mode, onModeChange, className, onAuthError, ...props 
     setFormErrors((prev) => ({ ...prev, [name]: errors[name as keyof FormErrors] }));
   }, [formValues, mode]);
 
+  const handleResetEmailChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setResetEmail(e.target.value);
+    setResetError(null);
+    setResetSuccess(null);
+  }, []);
+
+  // Handles form submission for email/password login and signup.
   const handleSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
@@ -301,6 +313,7 @@ export function AuthForm({ mode, onModeChange, className, onAuthError, ...props 
     }
   }, [formValues, mode, navigate, onAuthError]);
 
+  // Handles Google Sign-In process.
   const handleGoogleSignIn = useCallback(async () => {
     setGoogleLoading(true);
     setFormErrors((prev) => ({ ...prev, general: undefined }));
@@ -325,6 +338,8 @@ export function AuthForm({ mode, onModeChange, className, onAuthError, ...props 
   }, [onAuthError, navigate]);
 
   useEffect(() => {
+    // Checks for a redirect result from Firebase authentication (e.g., after Google Sign-In redirect).
+    // If a result is found, it means the user has successfully signed in, and they are navigated to the home page.
     getRedirectResult(auth).then((result) => {
       if (result) {
         navigate('/');
@@ -335,6 +350,8 @@ export function AuthForm({ mode, onModeChange, className, onAuthError, ...props 
     });
   }, [navigate]);
 
+  // Initiates the password reset process by switching to the 'resetPassword' mode.
+  // Pre-fills the reset email field if the user has already entered an email.
   const handleresetPassword = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
     setResetEmail(formValues.email || '');
@@ -344,12 +361,8 @@ export function AuthForm({ mode, onModeChange, className, onAuthError, ...props 
     onModeChange('resetPassword');
   }, [formValues.email, onModeChange]);
 
-  const handleResetEmailChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setResetEmail(e.target.value);
-    setResetError(null);
-    setResetSuccess(null);
-  }, []);
-
+  // Handles sending the password reset email.
+  // Validates the email format and then calls the Firebase sendResetPasswordEmail function.
   const handleSendResetEmail = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     setResetLoading(true);
@@ -378,7 +391,7 @@ export function AuthForm({ mode, onModeChange, className, onAuthError, ...props 
     }
   }, [resetEmail]);
 
-  // Define common animation properties
+  // Define common animation properties for form transitions
   const animationProps = {
     layout: true,
     initial: { opacity: 0, y: 12 },
@@ -388,6 +401,9 @@ export function AuthForm({ mode, onModeChange, className, onAuthError, ...props 
   };
 
   // Use a single AnimatePresence wrapping the conditional rendering
+  // This ensures smooth transitions between login/signup and reset password forms.
+  // `mode="wait"` ensures that the exiting component finishes its animation before the new one enters.
+  // `initial={false}` prevents the initial animation on mount if not desired.
   return (
     <AnimatePresence mode="wait" initial={false}>
       {mode === 'resetPassword' ? (
@@ -400,7 +416,7 @@ export function AuthForm({ mode, onModeChange, className, onAuthError, ...props 
             resetSuccess={resetSuccess}
             onChange={handleResetEmailChange}
             onSubmit={handleSendResetEmail}
-            onBack={() => handleModeChange('login')} // Use handleModeChange
+            onBack={() => handleModeChange('login')}
           />
         </motion.div>
       ) : (
