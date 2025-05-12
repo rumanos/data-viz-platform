@@ -83,6 +83,8 @@ export function getFirebaseAuthErrorMessage(errorCode: string): string {
       return 'No account found with this email.';
     case 'auth/wrong-password':
       return 'Incorrect password. Please try again.';
+    case 'auth/email-already-in-use':
+      return 'An account with this email already exists. Please log in or use a different email.';
     case 'auth/too-many-requests':
       return 'Too many failed attempts. Please try again later or reset your password.';
     case 'auth/network-request-failed':

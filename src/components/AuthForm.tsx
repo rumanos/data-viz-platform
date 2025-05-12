@@ -302,7 +302,13 @@ export function AuthForm({ mode, onModeChange, className, onAuthError, ...props 
       } else if (err instanceof Error) {
          errorMessage = err.message;
       }
-      const errorMsg = getFirebaseAuthErrorMessage(errorCode || errorMessage);
+
+      let errorMsg: string;
+      if (mode === 'signup' && errorCode === 'auth/email-already-in-use') {
+        errorMsg = 'An account with this email already exists. Please login or use a different email.';
+      } else {
+        errorMsg = getFirebaseAuthErrorMessage(errorCode || errorMessage);
+      }
       setFormErrors((prev) => ({ ...prev, general: errorMsg }));
       onAuthError?.(errorMsg);
     } finally {
