@@ -146,7 +146,7 @@ const ReusableChart = <TData extends object>({
 
                 <Customized
                   component={(props: CustomizedComponentProps<TData, (val: any) => number>) => {
-                    const { xAxisMap, yAxisMap, data } = props;
+                    const { xAxisMap, yAxisMap, data, width, height } = props;
 
                     if (!xAxisMap?.[0]?.scale || !yAxisMap?.[0]?.scale || !data) {
                       return null;
@@ -168,6 +168,8 @@ const ReusableChart = <TData extends object>({
                         yZeroCoordinate={yZeroCoordinate}
                         xAxisDataKey={xAxisDataKey}
                         lineDataKey={lineDataKey}
+                        chartWidth={width}
+                        chartHeight={height}
                       />
                     );
                   }}
@@ -198,6 +200,8 @@ interface AnimatedVerticalLinesProps<TData extends object, TScale = any> {
   yZeroCoordinate: number;
   xAxisDataKey: keyof TData;
   lineDataKey: keyof TData;
+  chartWidth?: number;
+  chartHeight?: number;
 }
 
 const AnimatedVerticalLines = <TData extends object>({
@@ -207,27 +211,21 @@ const AnimatedVerticalLines = <TData extends object>({
   yZeroCoordinate,
   xAxisDataKey,
   lineDataKey,
+  chartWidth,
+  chartHeight,
 }: AnimatedVerticalLinesProps<TData>) => {
-  const [animatedLines, setAnimatedLines] = useState<
+  const [lines, setLines] = useState<
     Array<{ x: number; y1: number; y2: number; length: number; id: string; shouldAnimate: boolean }>
   >([]);
-  const [startAnimation, setStartAnimation] = useState(false);
 
-  // Start animation after a delay (e.g., after main line chart animation)
+  // Effect 1: Calculate lines when data, scales, or dimensions change
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setStartAnimation(true);
-    }, 1700); // Adjust delay as needed (1500ms for Recharts default + 200ms buffer)
-    return () => clearTimeout(timer);
-  }, []);
-
-  useEffect(() => {
-    if (!startAnimation || !data || data.length === 0) {
-      setAnimatedLines([]); // Clear lines if animation shouldn't start or no data
+    if (!data || data.length === 0 || !xScale || !yScale || isNaN(yZeroCoordinate) || chartWidth === undefined || chartHeight === undefined ) {
+      setLines([]);
       return;
     }
 
-    const linesToRender: Array<typeof animatedLines[0]> = [];
+    const linesToRender: Array<typeof lines[0]> = [];
     data.forEach((entry, index) => {
       const xValue = entry[xAxisDataKey];
       const yValue = entry[lineDataKey];
@@ -246,51 +244,68 @@ const AnimatedVerticalLines = <TData extends object>({
         return;
       }
 
-      if (xCoord === undefined || yCoord === undefined || isNaN(xCoord) || isNaN(yCoord) || isNaN(yZeroCoordinate)) {
+      if (xCoord === undefined || yCoord === undefined || isNaN(xCoord) || isNaN(yCoord)) {
         return;
       }
 
       const length = Math.abs(yCoord - yZeroCoordinate);
+      // Ensure ID uniqueness, especially if chartWidth/Height are involved in line positioning or count.
+      // Adding chartWidth/Height to ID makes it unique per resize, forcing React to treat lines as new if dimensions change.
       linesToRender.push({
         x: xCoord,
-        y1: yZeroCoordinate, // Line starts from yZeroCoordinate
-        y2: yCoord,          // Line ends at yCoord
+        y1: yZeroCoordinate,
+        y2: yCoord,
         length,
-        id: `vline-anim-${index}-${String(xValue)}`,
-        shouldAnimate: false, // Will be set to true by the staggered animation effect
+        id: `vline-anim-${index}-${String(xValue)}-w${chartWidth}-h${chartHeight}`,
+        shouldAnimate: false,
       });
     });
-    setAnimatedLines(linesToRender);
-  }, [data, xScale, yScale, yZeroCoordinate, xAxisDataKey, lineDataKey, startAnimation]);
+    setLines(linesToRender);
+  }, [data, xScale, yScale, yZeroCoordinate, xAxisDataKey, lineDataKey, chartWidth, chartHeight]);
 
-  // Staggered animation effect
+  // Effect 2: Stagger animation when 'lines' state changes
   useEffect(() => {
-    if (!startAnimation || animatedLines.length === 0) return;
+    if (lines.length === 0 || !lines.some(line => !line.shouldAnimate)) {
+      // No lines to animate or all lines are already set to animate/animated
+      return;
+    }
 
-    let animationIndex = 0;
-    const interval = setInterval(() => {
-      if (animationIndex < animatedLines.length) {
-        setAnimatedLines(prevLines =>
-          prevLines.map((line, idx) =>
-            idx === animationIndex ? { ...line, shouldAnimate: true } : line
-          )
-        );
-        animationIndex++;
-      } else {
-        clearInterval(interval);
-      }
-    }, 50); // Stagger delay between each line's animation start
+    let animationOrderIndex = 0;
+    const intervalId = setInterval(() => {
+      setLines(currentLines => {
+        if (animationOrderIndex < currentLines.length) {
+          const lineToAnimate = currentLines[animationOrderIndex];
+          if (lineToAnimate && !lineToAnimate.shouldAnimate) {
+            const newLines = [...currentLines];
+            newLines[animationOrderIndex] = { ...lineToAnimate, shouldAnimate: true };
+            animationOrderIndex++;
+            return newLines;
+          } else if (lineToAnimate && lineToAnimate.shouldAnimate) {
+            animationOrderIndex++;
+            return currentLines;
+          } else {
+             // animationOrderIndex might be out of bounds if lines array changed rapidly
+             // or if the line is unexpectedly undefined.
+            clearInterval(intervalId);
+            return currentLines;
+          }
+        } else {
+          clearInterval(intervalId);
+          return currentLines;
+        }
+      });
+    }, 50); // Stagger delay
 
-    return () => clearInterval(interval);
-  }, [animatedLines.length, startAnimation]); // Rerun if number of lines changes or animation starts
+    return () => clearInterval(intervalId);
+  }, [lines]); // Rerun if the 'lines' array reference changes
 
-  if (!startAnimation) {
-    return null; // Don't render anything until animation is due to start
+  if (lines.length === 0) {
+    return null;
   }
 
   return (
     <g>
-      {animatedLines.map(({ x, y1, y2, length, id, shouldAnimate }) => (
+      {lines.map(({ x, y1, y2, length, id, shouldAnimate }) => (
         <line
           key={id}
           x1={x}
