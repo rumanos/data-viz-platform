@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 import { Home, Bell, ClipboardList, CloudUpload, Settings } from 'lucide-react';
 import { PlaceholderView } from '@/components/views/PlaceholderView';
 import { HomeView } from '@/components/views/HomeView';
+
 const iconMap = {
   Home,
   Bell,
@@ -50,7 +51,7 @@ function createDashboardMenuItem(config: MenuItemConfig): SidebarMenuItem {
   return {
     key: config.key,
     label: itemLabel,
-    icon: <IconComponent size={20} />,
+    icon: <IconComponent size={20} className='stroke-[1.8px]' />,
     alert: config.alert,
     content: config.content === undefined
       ? <PlaceholderView label={itemLabel} icon={<IconComponent size={48} className="stroke-1" />} />

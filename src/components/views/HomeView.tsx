@@ -1,10 +1,13 @@
 import React from 'react';
 import { ReusableTabs } from '@/components/ReusableTabs';
+import { PlaceholderView } from './PlaceholderView';
+import { CarFront, ParkingMeter } from 'lucide-react';
+import ChargingTabContent from '../ChargingTabContent';
 
-// Placeholder content for tabs
-const Tab1Content: React.FC = () => <div className="p-4">Charging Station</div>;
-const Tab2Content: React.FC = () => <div className="p-4">Fleet Sizing</div>;
-const Tab3Content: React.FC = () => <div className="p-4">Parking</div>;
+const Tab1Content: React.FC = () => <ChargingTabContent onEditVariables={() => console.log("Edit variables clicked")} />
+
+const Tab2Content: React.FC = () => <PlaceholderView label="Fleet Sizing" icon={<CarFront size={48} className="stroke-1" />} />
+const Tab3Content: React.FC = () => <PlaceholderView label="Parking" icon={<ParkingMeter size={48} className="stroke-1"/>} />
 
 const homeTabsConfig = [
   { key: 'charging', label: 'Charging Station', content: <Tab1Content /> }, // Changed value to tab1 to match content
@@ -28,7 +31,7 @@ export const HomeView: React.FC = () => {
         searchButtonConfig={{
           onClick: handleSearch,
           label: "Search",
-          buttonClassName: "md:w-[237px]",  
+          buttonClassName: "md:w-48 lg:w-60",  
         }}
       />
     </div>
