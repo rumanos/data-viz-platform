@@ -31,7 +31,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({ isEffectivelyExpanded 
     navigate('/');
   };
 
-  if (!user) return null; // Don't render if no user
+  if (!user) return null;
 
   return (
     <div className={cn("flex h-16 w-full relative", isEffectivelyExpanded ? "justify-start" : "justify-center")}>

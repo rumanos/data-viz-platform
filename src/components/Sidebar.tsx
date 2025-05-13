@@ -32,9 +32,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ menuItems }) => {
   const navigate = useNavigate();
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false); 
   const validMenuKeys = menuItems.map((item) => item.key); 
+  // Determines the active menu item. If the stored selectedMenuKey is not valid
+  // or not found in the current menuItems, it defaults to the key of the first
+  // menuItem, or an empty string if menuItems is empty.
   const selectedMenu = validMenuKeys.includes(selectedMenuKey) ? selectedMenuKey : (menuItems[0]?.key || ''); 
 
   useEffect(() => { 
+    // Handles window resize events to automatically close the mobile sidebar
+    // if the screen width becomes large enough for the desktop sidebar layout.
     const handleResize = () => {
       if (window.innerWidth >= 768 && mobileSidebarOpen) {
         setMobileSidebarOpen(false);
@@ -44,6 +49,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ menuItems }) => {
     return () => window.removeEventListener('resize', handleResize);
   }, [mobileSidebarOpen]);
 
+  // Generates the sidebar's navigation content.
+  // Adapts for mobile (full width, different toggle mechanism) or desktop (fixed width, expand/collapse).
   const sidebarContent = (isMobile: boolean) => (
     <nav className="h-full flex flex-col">
       <div className="p-4 pb-2 flex justify-between items-center">
@@ -109,7 +116,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ menuItems }) => {
             aria-label="Open sidebar"
           >
             <AlignJustify className="w-6 h-6" />
-            {/* Use the menuItems prop */}
             <span className="text-white font-medium text-base truncate max-w-[120px]">{menuItems.find((item) => item.key === selectedMenu)?.label}</span>
           </Button>
         </SheetTrigger>
