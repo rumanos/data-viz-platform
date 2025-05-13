@@ -63,6 +63,64 @@ interface CustomizedComponentProps<TData extends object, TScale = any> { // Usin
   offset?: { top: number; left: number; right: number; bottom: number };
 }
 
+// Props for the CustomXAxisTick component
+interface CustomXAxisTickPropsFromRecharts {
+  x?: number;
+  y?: number;
+  payload?: { value: string | number }; // payload contains the tick value
+  index?: number; // index of the tick
+}
+
+interface CustomXAxisTickOwnProps {
+  formatter: (value: unknown, index: number) => string; // The original formatter
+}
+
+type FullCustomXAxisTickProps = CustomXAxisTickPropsFromRecharts & CustomXAxisTickOwnProps;
+
+// Helper component for custom X-axis ticks with "Now" label
+const CustomXAxisTick: React.FC<FullCustomXAxisTickProps> = (props) => {
+  const { x, y, payload, index, formatter } = props;
+
+  if (!payload || typeof x === 'undefined' || typeof y === 'undefined' || typeof index === 'undefined') {
+    return null;
+  }
+
+  // Use the provided formatter for the main label text
+  const formattedTickValue = formatter(payload.value, index);
+  // The original tick value from data (e.g., "May")
+  const originalTickValue = String(payload.value);
+
+  // Get current month in short format (e.g., "Jan", "Feb")
+  const currentMonthShort = new Date().toLocaleDateString('en-US', { month: 'short' });
+
+  const textStyle = {
+    fontSize: '12px', // Corresponds to Recharts default tick font size
+    fill: 'hsl(var(--muted-foreground))', // Use the same color as other ticks
+    textAnchor: 'middle' as const,
+  };
+
+  if (originalTickValue === currentMonthShort) {
+    return (
+      <g transform={`translate(${x},${y})`}>
+        <text x={0} y={0} dy={16} {...textStyle}>
+          {formattedTickValue}
+          <tspan x={0} dy="1.5em" style={{ fontWeight: 'normal', fill: 'hsl(var(--primary-foreground))' }}> {/* Style "Now" to stand out */}
+            Now
+          </tspan>
+        </text>
+      </g>
+    );
+  }
+
+  return (
+    <g transform={`translate(${x},${y})`}>
+      <text x={0} y={0} dy={16} {...textStyle}>
+        {formattedTickValue}
+      </text>
+    </g>
+  );
+};
+
 const ReusableChart = <TData extends object>({
   title,
   dropdownOptions,
@@ -117,9 +175,9 @@ const ReusableChart = <TData extends object>({
                 data={chartData}
                 margin={{
                   top: 0,
-                  right: 0,
+                  right: 20,
                   left: 0,
-                  bottom: 0,
+                  bottom: 20,
                 }}
               >
                 <CartesianGrid vertical={false} stroke="#343434" strokeWidth={0.77} />
@@ -128,7 +186,7 @@ const ReusableChart = <TData extends object>({
                   tickLine={false}
                   axisLine={false}
                   tickMargin={8}
-                  tickFormatter={xAxisTickFormatter}
+                  tick={<CustomXAxisTick formatter={xAxisTickFormatter} />}
                   stroke="hsl(var(--muted-foreground))"
                 />
                 <YAxis
