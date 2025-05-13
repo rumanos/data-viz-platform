@@ -52,9 +52,15 @@
     *   `ThemeProvider` for managing application themes (e.g., light/dark mode).
     *   TailwindCSS configured for styling, ensuring proper rendering of UI elements.
     *   Validation errors are cleared when switching between authentication modes.
+    *   Responsive sidebar with expand/collapse functionality and mobile drawer.
+*   **Data Visualization:**
+    *   Displays a data visualization with chart.
+    *   Includes a "Variables Panel" with a list of adjustable parameters for the data visualization.
+    *   Features action buttons, including one to "Edit Variables."
 *   **State Management:**
     *   Zustand used for global state management.
     *   Manages authentication state, including the current user and loading status, by subscribing to Firebase auth changes.
+    *   Manages sidebar state, persisting user preferences across sessions.
 *   **Development & Tooling:**
     *   Project setup with Vite, React, TypeScript, TailwindCSS, and Shadcn.
     *   Automated tests covering `AuthForm` functionalities (login, signup, reset) and `ProtectedRoute`.
