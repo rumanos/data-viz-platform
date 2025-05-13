@@ -23,7 +23,7 @@ export const HomeView: React.FC = () => {
   };
 
   return (
-    <div className="w-full h-full flex flex-col"> 
+    <div className="w-full h-full flex flex-col overflow-x-hidden"> 
       <ReusableTabs
         tabs={homeTabsConfig}
         tabsContentClassName="px-6 py-4 md:bg-[#161618] md:border-t md:border-b md:border-l md:border-border md:rounded-tl-[5px] md:rounded-bl-[5px] flex-1"

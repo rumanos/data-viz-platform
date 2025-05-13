@@ -43,7 +43,7 @@ interface ReusableChartProps<TData extends object> {
   chartConfig: ChartConfig;
   xAxisDataKey: keyof TData;
   lineDataKey: keyof TData;
-  yAxisTickFormatter?: (value: unknown) => string;
+  yAxisTickFormatter?: (value: unknown, index: number) => string;
   xAxisTickFormatter?: (value: unknown, index: number) => string;
   className?: string;
   yAxisLabel?: string;
@@ -80,6 +80,10 @@ type FullCustomXAxisTickProps = CustomXAxisTickPropsFromRecharts & CustomXAxisTi
 // Helper component for custom X-axis ticks with "Now" label
 const CustomXAxisTick: React.FC<FullCustomXAxisTickProps> = (props) => {
   const { x, y, payload, index, formatter } = props;
+
+  if (index === 0) { // Hide the first tick
+    return null;
+  }
 
   if (!payload || typeof x === 'undefined' || typeof y === 'undefined' || typeof index === 'undefined') {
     return null;
@@ -131,7 +135,10 @@ const ReusableChart = <TData extends object>({
   chartConfig,
   xAxisDataKey,
   lineDataKey,
-  yAxisTickFormatter = (value) => typeof value === 'number' ? `$${value / 1000}K` : String(value),
+  yAxisTickFormatter = (value, index) => {
+    if (index === 0) return ""; // Hide the first tick
+    return typeof value === 'number' ? `$${value / 1000}K` : String(value);
+  },
   xAxisTickFormatter = (value) => {
     try {
       // Attempt date formatting assuming value is string/number representing month-year like 'YYYY-MM'
@@ -178,25 +185,27 @@ const ReusableChart = <TData extends object>({
                   top: 0,
                   right: 20,
                   left: 0,
-                  bottom: 20,
+                  bottom: 40,
                 }}
               >
                 <CartesianGrid vertical={false} stroke="#343434" strokeWidth={0.77} />
                 <XAxis
                   dataKey={xAxisDataKey as string}
                   tickLine={false}
-                  axisLine={false}
+                  axisLine={true}
+                  strokeWidth={0.3}
                   tickMargin={8}
                   tick={<CustomXAxisTick formatter={xAxisTickFormatter} />}
-                  stroke="hsl(var(--muted-foreground))"
+                  stroke="#FFFFFF"
                 />
                 <YAxis
                   tickLine={false}
-                  axisLine={false}
+                  axisLine={true}
                   tickMargin={8}
                   tickFormatter={yAxisTickFormatter}
                   tick={{ fontSize: '12.25px', fontWeight: '500', fill: 'hsl(var(--bg-primary))' }}
-                  stroke="hsl(var(--muted-foreground))"
+                  stroke="#FFFFFF"
+                  strokeWidth={0.3}
                   label={yAxisLabel ? { value: yAxisLabel, angle: -90, position: 'insideLeft', offset: 0, style: { textAnchor: 'middle', fill: 'hsl(var(--muted-foreground))' } } : undefined}
                 />
                 <Tooltip
@@ -377,7 +386,7 @@ const AnimatedVerticalLines = <TData extends object>({
           strokeDasharray={length}
           strokeDashoffset={shouldAnimate ? 0 : length} // Animate by changing dashoffset
           style={{
-            transition: shouldAnimate ? `stroke-dashoffset 0.5s ease-out` : 'none', // CSS transition for the drawing effect
+            transition: shouldAnimate ? `stroke-dashoffset 0.3s ease-out` : 'none', // CSS transition for the drawing effect
             // Ensure line draws from bottom to top if y2 < y1, or top to bottom if y2 > y1
             // This is implicitly handled by y1 being yZeroCoordinate and y2 being the value's coordinate.
             // The 'length' is always positive.
