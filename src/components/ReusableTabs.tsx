@@ -200,7 +200,6 @@ export const ReusableTabs: React.FC<ReusableTabsProps> = ({
           )}
         </div>
       </div>
-
       {tabs.map((tab) => (
         <TabsContent
           key={tab.key}
