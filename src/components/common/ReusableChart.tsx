@@ -94,17 +94,18 @@ const CustomXAxisTick: React.FC<FullCustomXAxisTickProps> = (props) => {
   const currentMonthShort = new Date().toLocaleDateString('en-US', { month: 'short' });
 
   const textStyle = {
-    fontSize: '12px', // Corresponds to Recharts default tick font size
-    fill: 'hsl(var(--muted-foreground))', // Use the same color as other ticks
+    fontSize: '12.25px', 
+    fill: 'hsl(var(--bg-primary))',
+    fontWeight: '500',
     textAnchor: 'middle' as const,
   };
 
   if (originalTickValue === currentMonthShort) {
     return (
       <g transform={`translate(${x},${y})`}>
-        <text x={0} y={0} dy={16} {...textStyle}>
+        <text x={0} y={0} dy={17} {...textStyle}>
           {formattedTickValue}
-          <tspan x={0} dy="1.5em" style={{ fontWeight: 'normal', fill: 'hsl(var(--primary-foreground))' }}> {/* Style "Now" to stand out */}
+          <tspan x={-2} dy="1.6em" style={{ fontSize: '11px', fontWeight: 'light', fill: 'hsl(var(--muted-foreground))' }}> {/* Style "Now" to stand out */}
             Now
           </tspan>
         </text>
@@ -194,11 +195,12 @@ const ReusableChart = <TData extends object>({
                   axisLine={false}
                   tickMargin={8}
                   tickFormatter={yAxisTickFormatter}
+                  tick={{ fontSize: '12.25px', fontWeight: '500', fill: 'hsl(var(--bg-primary))' }}
                   stroke="hsl(var(--muted-foreground))"
-                  label={yAxisLabel ? { value: yAxisLabel, angle: -90, position: 'insideLeft', offset: -10, style: { textAnchor: 'middle', fill: 'hsl(var(--muted-foreground))' } } : undefined}
+                  label={yAxisLabel ? { value: yAxisLabel, angle: -90, position: 'insideLeft', offset: 0, style: { textAnchor: 'middle', fill: 'hsl(var(--muted-foreground))' } } : undefined}
                 />
                 <Tooltip
-                  cursor={{ stroke: 'hsl(var(--muted-foreground))', strokeDasharray: '6 3', strokeWidth: 2.3 }}
+                  cursor={{ stroke: 'hsl(var(--muted-foreground))', strokeDasharray: '6 3', strokeWidth: 3.3 }}
                   content={<ChartTooltipContent indicator="line" />}
                 />
 
