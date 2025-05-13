@@ -17,7 +17,6 @@ import {
 import type { ChartConfig } from "@/components/ui/chart";
 import {
   ChartContainer,
-  ChartTooltipContent,
 } from "@/components/ui/chart";
 import {
   Select,
@@ -177,9 +176,8 @@ interface CustomTooltipProps {
   yAxisTickFormatter: (value: unknown, index: number) => string; // Pass the formatter
 }
 
-const CustomChartTooltip: React.FC<CustomTooltipProps> = ({ active, payload, label, yAxisTickFormatter }) => {
+const CustomChartTooltip: React.FC<CustomTooltipProps> = ({ active, payload, yAxisTickFormatter }) => {
   if (active && payload && payload.length) {
-    const data = payload[0].payload; // The raw data object for the hovered point
     const value = payload[0].value;  // The specific value for this line/bar
 
     // Use the yAxisTickFormatter, but remove the "hide first tick" logic for tooltip

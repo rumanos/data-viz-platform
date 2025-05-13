@@ -1,9 +1,11 @@
 import BestResultsAccordion, { type ScenarioData } from "./common/BestResultsAccordion";
 import KpiCardsGrid, { type KpiData } from "./common/KpiCardsGrid";
 import ReusableChart from "./common/ReusableChart";
+import TabContentTitle from "./common/TabContentTitle";
 import * as React from "react";
 import type { ChartConfig } from "@/components/ui/chart";
 import type { DropdownOption } from "./common/ReusableChart";
+import { Zap } from "lucide-react";
 
 interface ChargingTabContentProps {
   onEditVariables: () => void;
@@ -101,6 +103,13 @@ const ChargingTabContent: React.FC<ChargingTabContentProps> = ({
 
   return (
     <div className="w-full h-full flex flex-col items-start mt-4 overflow-x-hidden">
+      <TabContentTitle 
+        title="Charging Station" 
+        icon={<Zap size={20} fill="#ffffff" />}
+        onHistoryClick={() => {}}
+        onEditVariablesClick={() => {}}
+        onUploadClick={() => {}}
+      />
       <BestResultsAccordion
         scenarios={sampleScenarios}
         className="w-full"
