@@ -29,6 +29,49 @@ import {
 } from "@/components/ui/select";
 import SectionWrapper from "./SectionWrapper";
 
+// --- START OF NEW ICON COMPONENTS ---
+
+// Simple SVG Help Icon
+const HelpCircleIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="16"
+    height="16"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    {...props}
+  >
+    <circle cx="12" cy="12" r="10" />
+    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+    <line x1="12" y1="17" x2="12.01" y2="17" />
+  </svg>
+);
+
+// Simple SVG Arrow Up Circle Icon
+const ArrowUpCircleIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="16"
+    height="16"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    {...props}
+  >
+    <circle cx="12" cy="12" r="10" />
+    <polyline points="12 16 12 8 16 12 8 12" /> 
+    {/* Corrected polyline for up arrow: <polyline points="16 12 12 8 8 12" /> <line x1="12" y1="16" x2="12" y2="8" /> */}
+  </svg>
+);
+// --- END OF NEW ICON COMPONENTS ---
+
 export interface DropdownOption {
   value: string;
   label: string;
@@ -126,6 +169,40 @@ const CustomXAxisTick: React.FC<FullCustomXAxisTickProps> = (props) => {
   );
 };
 
+// --- START OF NEW CUSTOM TOOLTIP COMPONENT ---
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: any[]; // Payload type from Recharts can be more specific if needed
+  label?: string | number;
+  yAxisTickFormatter: (value: unknown, index: number) => string; // Pass the formatter
+}
+
+const CustomChartTooltip: React.FC<CustomTooltipProps> = ({ active, payload, label, yAxisTickFormatter }) => {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload; // The raw data object for the hovered point
+    const value = payload[0].value;  // The specific value for this line/bar
+
+    // Use the yAxisTickFormatter, but remove the "hide first tick" logic for tooltip
+    const formattedValue = yAxisTickFormatter(value, 1); // Pass index 1 to avoid empty string
+
+    return (
+      <div className="bg-[#343434] p-3 rounded-[5px] shadow-md text-white text-xs border border-[#525252]">
+        <div className="flex justify-between items-center mb-1">
+          <span className="text-lg font-semibold">{formattedValue}</span>
+          <HelpCircleIcon className="text-gray-400" />
+        </div>
+        <div className="flex items-center">
+          <ArrowUpCircleIcon className="text-[#C8E972] mr-1.5" />
+          <span className="text-gray-300">4.6% above target</span> {/* Placeholder text */}
+        </div>
+      </div>
+    );
+  }
+
+  return null;
+};
+// --- END OF NEW CUSTOM TOOLTIP COMPONENT ---
+
 const ReusableChart = <TData extends object>({
   title,
   dropdownOptions,
@@ -155,6 +232,14 @@ const ReusableChart = <TData extends object>({
   className = "",
   yAxisLabel,
 }: ReusableChartProps<TData>) => {
+  // Default yAxisTickFormatter for the component's props
+  const defaultYAxisTickFormatter = (val: unknown, index: number) => {
+    if (index === 0) return ""; 
+    return typeof val === 'number' ? `$${val / 1000}K` : String(val);
+  };
+  // Use the passed yAxisTickFormatter if provided, otherwise use the default
+  const currentYAxisTickFormatter = yAxisTickFormatter || defaultYAxisTickFormatter;
+
   return (
     <SectionWrapper title={title} className={className}>
       <Card className="relative w-full h-full bg-[#222324] border-[1px] border-[#525252] rounded-[5px] p-2 md:p-[30px]">
@@ -202,7 +287,7 @@ const ReusableChart = <TData extends object>({
                   tickLine={false}
                   axisLine={true}
                   tickMargin={8}
-                  tickFormatter={yAxisTickFormatter}
+                  tickFormatter={currentYAxisTickFormatter}
                   tick={{ fontSize: '12.25px', fontWeight: '500', fill: 'hsl(var(--bg-primary))' }}
                   stroke="#FFFFFF"
                   strokeWidth={0.3}
@@ -210,7 +295,7 @@ const ReusableChart = <TData extends object>({
                 />
                 <Tooltip
                   cursor={{ stroke: 'hsl(var(--muted-foreground))', strokeDasharray: '6 3', strokeWidth: 3.3 }}
-                  content={<ChartTooltipContent indicator="line" />}
+                  content={<CustomChartTooltip yAxisTickFormatter={currentYAxisTickFormatter} />}
                 />
 
                 <Customized

@@ -111,8 +111,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ menuItems }) => {
       <Sheet open={mobileSidebarOpen} onOpenChange={setMobileSidebarOpen}>
         <SheetTrigger asChild>
           <Button
-            className="fixed top-4 left-4 z-50 md:hidden flex items-center gap-2 px-3 py-2"
-            variant="ghost"
+            className="fixed top-4 left-4 z-50 md:hidden flex items-center gap-2 px-3 py-2 bg-background hover:bg-accent"
+            variant="secondary"
             aria-label="Open sidebar"
           >
             <AlignJustify className="w-6 h-6" />
