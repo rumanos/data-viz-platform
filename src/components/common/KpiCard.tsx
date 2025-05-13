@@ -26,6 +26,7 @@ export const KpiCard: React.FC<KpiCardProps> = ({
   const [animatedValue, setAnimatedValue] = useState(0);
   const [prefix, setPrefix] = useState("");
   const [suffix, setSuffix] = useState("");
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     // Parse the incoming string value
@@ -51,6 +52,19 @@ export const KpiCard: React.FC<KpiCardProps> = ({
       setAnimatedValue(NaN); // Or handle differently
     }
   }, [value]);
+
+  useEffect(() => {
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkIsMobile(); // Check on mount
+    window.addEventListener("resize", checkIsMobile); // Add resize listener
+
+    return () => {
+      window.removeEventListener("resize", checkIsMobile); // Cleanup listener
+    };
+  }, []);
 
   return (
     <div
@@ -86,7 +100,11 @@ export const KpiCard: React.FC<KpiCardProps> = ({
       <span className="text-[32px] text-right font-bold text-white">
         {prefix}
         {!isNaN(animatedValue) ? (
-          <NumberFlow value={animatedValue} />
+          isMobile ? (
+            <>{animatedValue}</> // Render plain value on mobile
+          ) : (
+            <NumberFlow value={animatedValue} />
+          )
         ) : (
           // Render suffix directly if animatedValue is NaN (original value wasn't parsable)
           // This ensures that if the original value was e.g. "N/A", it's still shown.
