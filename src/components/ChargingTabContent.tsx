@@ -6,6 +6,7 @@ import * as React from "react";
 import type { ChartConfig } from "@/components/ui/chart";
 import type { DropdownOption } from "./common/ReusableChart";
 import { Zap } from "lucide-react";
+import EditVariablesSheet from "./common/EditVariablesSheet";
 
 interface ChargingTabContentProps {
   onEditVariables: () => void;
@@ -95,6 +96,8 @@ const ChargingTabContent: React.FC<ChargingTabContentProps> = ({
     sampleDropdownOptions[0]?.value as SampleChartDataKeys || "unsatisfiedDemand"
   );
 
+  const [editVariablesOpen, setEditVariablesOpen] = React.useState(false);
+
   React.useEffect(() => {
     if (sampleDropdownOptions.length > 0 && !sampleDropdownOptions.some(opt => opt.value === selectedMetric)) {
       setSelectedMetric(sampleDropdownOptions[0].value as SampleChartDataKeys);
@@ -107,9 +110,10 @@ const ChargingTabContent: React.FC<ChargingTabContentProps> = ({
         title="Charging Station" 
         icon={<Zap size={20} fill="#ffffff" />}
         onHistoryClick={() => {}}
-        onEditVariablesClick={() => {}}
+        onEditVariablesClick={() => setEditVariablesOpen(true)}
         onUploadClick={() => {}}
       />
+      <EditVariablesSheet open={editVariablesOpen} onOpenChange={setEditVariablesOpen} />
       <BestResultsAccordion
         scenarios={sampleScenarios}
         className="w-full"
