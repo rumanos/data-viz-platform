@@ -126,7 +126,7 @@ To run the automated tests for components and functionality:
 ```bash
 # Using pnpm
 pnpm test
-
+```
 
 ## 💡 Technical Decisions
 * **State Management:** Went with Zustand because Redux was overkill and Context Providers are slow and messy. Zustand's API is super clean and the bundle size is tiny.
