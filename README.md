@@ -74,7 +74,7 @@
 
 1.  **Clone the repository:**
     ```bash
-    git clone [https://github.com/rumanos/data-viz-platform.git](https://github.com/rumanos/data-viz-platform.git)
+    git clone https://github.com/rumanos/data-viz-platform.git
     cd data-viz-platform
     ```
 
