@@ -83,6 +83,7 @@ export const VariableSelectionArea: React.FC<VariableSelectionAreaProps> = () =>
         { id: 'beta', label: 'Beta Option', description: "Details for Alpha." },
         { id: 'gamma', label: 'Gamma Option', description: "Details for Gamma." },
       ],
+      initialSelectedIds: [],
       onSelectionChange: (selectedOptionIds: string[]) => {
         console.log('Category 3 Selected options:', selectedOptionIds);
       },
@@ -90,7 +91,7 @@ export const VariableSelectionArea: React.FC<VariableSelectionAreaProps> = () =>
   ];
 
   const contextWindowVariants = {
-    hidden: { opacity: 0, y: 20, scale: 0.95 },
+    hidden: { opacity: 0, y: 20, scale: 1 },
     visible: {
       opacity: 1,
       y: 0,
@@ -100,14 +101,14 @@ export const VariableSelectionArea: React.FC<VariableSelectionAreaProps> = () =>
     exit: {
       opacity: 0,
       y: 10,
-      scale: 0.95,
-      transition: { duration: 0.2, ease: "easeIn" }
+      scale: 1,
+      transition: { duration: 0.1, ease: "easeIn" }
     }
   };
 
   return (
     <div className="w-full max-w-2xl border-2 bg-neutral-900 rounded-[5px]">
-      <div className="p-6  space-y-6">
+      <div className="p-6 space-y-6 max-h-[300px] md:max-h-[400px] overflow-y-auto">
       {variableCategories.map(category => (
         <VariableCategorySelect
           key={category.id}

@@ -46,11 +46,12 @@ const EditVariablesSheet: React.FC<EditVariablesSheetProps> = ({ open, onOpenCha
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
+
       <SheetContent
         side="right"
-        className="w-full max-w-full! md:w-2xl p-[18px] [&_[data-slot=sheet-close]]:hidden"
+        className="w-full max-w-full! md:w-2xl p-0 [&_[data-slot=sheet-close]]:hidden overflow-y-auto"
       >
-        <SheetHeader className="relative flex items-center justify-between flex-row text-[18px] md:text-[24px] font-semibold h-12">
+        <SheetHeader className="flex items-center justify-between flex-row text-[18px] md:text-[24px] font-semibold h-12 sticky z-50 top-0 bg-background p-4 py-8 md:p-8 border-b border-border">
           <SheetTitle>Edit Variables</SheetTitle>
           <Button
             variant="ghost"
@@ -62,7 +63,7 @@ const EditVariablesSheet: React.FC<EditVariablesSheetProps> = ({ open, onOpenCha
         </SheetHeader>
 
 
-        <div className="container px-4 py-0">
+        <div className="container px-4 md:px-8 py-0 pb-4 md:pb-8">
           <SearchWithActions />
           <div className="mt-4">
             <VariableSelectionArea />
@@ -77,7 +78,7 @@ const EditVariablesSheet: React.FC<EditVariablesSheetProps> = ({ open, onOpenCha
               </AccordionContent>
             </AccordionItem>
           </Accordion>
-          <div className="mt-4"></div>
+          <div className="mt-2 md:mt-4"></div>
           <Accordion type="single" defaultValue="item-1" className="space-y-3">
             <AccordionItem value="item-4">
               <AccordionTrigger>Variable Category 2</AccordionTrigger>

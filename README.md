@@ -8,24 +8,23 @@
 
 ## ✨ Key Features Implemented
 
-The platform implements several key features and interactions:
-
 * **Authentication:**
     * Secure user login, signup, and password reset functionality using Firebase Authentication.
     * "Continue with Google" option for seamless OAuth login and signup.
-    * Comprehensive form validation for all authentication forms.
-    * Specific error handling for common scenarios (e.g., existing email address during signup).
+    * Form validation for all authentication forms.
+    * Remembers email address when changing between login, signup and reset password
 * **Routing & Navigation:**
     * Secure pages implemented using Protected Routes, ensuring only authenticated users can access them.
-    * Dedicated routes for login, signup, and password reset pages.
+    * Dedicated routes for login, signup, and password reset pages within unified component.
     * Custom `NotFound` page for handling invalid routes gracefully.
     * Responsive sidebar with expand/collapse functionality and a mobile-friendly drawer for navigation.
 * **User Interface & Experience:**
-    * Modular `AuthForm` component designed with reusable sub-components for maintainability.
     * Unified animations and smooth transitions between different authentication modes (login, signup, reset).
     * `ThemeProvider` for managing application themes (e.g., light/dark mode support).
     * TailwindCSS configured for utility-first styling, ensuring a modern and responsive UI.
     * Validation errors are intelligently cleared when switching between authentication modes.
+    * In `Edit Variables` while waiting for context window, wait animation is shown
+    * Charts and Variable panel numbers are animated when props change
 * **Core Screens:**
     * **Dashboard Screen:** Displays a primary data visualization (e.g., chart/graph). Includes a "Variables Panel" and action buttons like "Edit Variables."
     * **Variable Editing Slide-Over Card Screen:** Accessed via the "Edit Variables" button. This overlay allows users to adjust data visualization parameters through interactive elements.
@@ -39,9 +38,10 @@ The platform implements several key features and interactions:
         * Provides the ability to select variable options from categories with managed state.
         * Allows users to modify variables used in the visualization.
 * **State Management:**
-    * Zustand utilized for efficient global state management.
+    * Zustand utilized for global state management.
     * Manages authentication state (current user, loading status) by subscribing to Firebase auth changes.
     * Manages sidebar state, persisting user preferences (e.g., expanded/collapsed) across sessions.
+    * Manages variable selection state in Edit Variables slide-over
 * **Development & Tooling:**
     * Project setup with Vite, React, TypeScript, TailwindCSS, and Shadcn/ui components.
     * Automated tests (using Vitest/React Testing Library) covering `AuthForm` functionalities (login, signup, reset) and `ProtectedRoute
@@ -54,29 +54,13 @@ The platform implements several key features and interactions:
 * **Build Tool:** Vite
 * **Styling:** TailwindCSS
 * **UI Components:** Shadcn/ui
-* **Routing:** React Router
+* **Routing:** React Router (react-router-dom)
 * **State Management:** Zustand
-* **Authentication:** Firebase Authentication (Email/Password, Google OAuth)
+* **Authentication:** Firebase (Email/Password, Google OAuth)
+* **Animation:** Motion (motion)
+* **Charts:** Recharts
+* **Icons:** Lucide React
 * **Testing:** Vitest, React Testing Library
-
-
-## 💡 Technical Decisions
-* **State Management:** Went with Zustand because Redux was overkill and Context is messy. Zustand's API is super clean and the bundle size is tiny.
-* **Styling:** Tailwind + Shadcn/ui. Tailwind's utility classes are a game changer for rapid dev, and Shadcn gave some solid components out of the box.
-* **Firebase:** Firebase Auth was a no-brainer - got email/pass and Google OAuth with full customization.
-* **TypeScript:** Added TS because JavaScript was giving me anxiety. The type safety is worth the extra setup time.
-* **Motion:**  To enhance user experience, used in authentication, charts, 404 page and for subtle transitions
-* **Rechart:** Since I used Shadcn, It came with Recharts for creating custom chart. 
-
-## 🚧 Improvements
-* **Limitations:**
-    * Currently uses dummy data for visualizations; integration with a real data
-    * Interactivity needs to be added between variable panel and chart
-    * Homepanel components need to be further modularized
-    * Chart data needs to be structured. and the chart styling needs to be better aligned with the design
-
-## ⏱️ Time Spent
-* **Total Time:** Approximately 7 hours
 
 
 ## 🚀 Getting Started
@@ -142,3 +126,21 @@ To run the automated tests for components and functionality:
 ```bash
 # Using pnpm
 pnpm test
+
+
+## 💡 Technical Decisions
+* **State Management:** Went with Zustand because Redux was overkill and Context Providers are slow and messy. Zustand's API is super clean and the bundle size is tiny.
+* **Styling:** Tailwind + Shadcn/ui. Tailwind's utility classes are a game changer for rapid dev, and Shadcn gave some solid components out of the box.
+* **Firebase:** Firebase Auth for it's full customization and out of the box functionality.
+* **Motion:**  To enhance user experience, used in authentication, charts, 404 page and for subtle transitions
+* **Recharts:** Since I used Shadcn, It came with Recharts for creating custom chart. 
+
+## 🚧 Improvements
+* **Limitations:**
+    * Currently uses dummy data for visualizations; integration with a real data
+    * Interactivity needs to be added between variable panel and chart
+    * Homepanel components need to be further modularized
+    * Chart data needs to be structured. and the chart styling needs to be better aligned with the design
+
+## ⏱️ Time Spent
+* **Total Time:** Approximately 7 hours

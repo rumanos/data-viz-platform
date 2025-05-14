@@ -1,5 +1,6 @@
-import React, { useEffect, useCallback, useRef } from 'react';
+import React, { useEffect, useCallback, useRef, useState } from 'react';
 import { Plus, Gem, Check } from 'lucide-react';
+import { motion } from 'motion/react';
 import { useVariableSelectionStore } from '../../store/variableSelectionStore';
 
 // Optional description for the context window
@@ -31,59 +32,90 @@ export const VariableCategorySelect: React.FC<VariableCategorySelectProps> = ({
   const toggleOptionInStore = useVariableSelectionStore((state) => state.toggleOptionSelection);
   const selectedIdsFromStore = useVariableSelectionStore((state) => state.getSelectedOptions(categoryTitle));
 
-  const hoverTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const detailViewDelayTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const [activelyHoveringOptionId, setActivelyHoveringOptionId] = useState<string | null>(null);
 
   useEffect(() => {
     initializeCategoryInStore(categoryTitle, initialSelectedIds);
 
-    if (hoverTimerRef.current) {
-      clearTimeout(hoverTimerRef.current);
-    }
+    return () => {
+      if (detailViewDelayTimerRef.current) {
+        clearTimeout(detailViewDelayTimerRef.current);
+      }
+    };
   }, [categoryTitle, initialSelectedIds, initializeCategoryInStore]);
 
-  const clearLocalHoverTimer = useCallback(() => {
-    if (hoverTimerRef.current) {
-      clearTimeout(hoverTimerRef.current);
-      hoverTimerRef.current = null;
+  const clearTimersAndResetProgress = useCallback(() => {
+    if (detailViewDelayTimerRef.current) {
+      clearTimeout(detailViewDelayTimerRef.current);
+      detailViewDelayTimerRef.current = null;
     }
+    setActivelyHoveringOptionId(null);
   }, []);
 
   useEffect(() => {
     return () => {
-      clearLocalHoverTimer();
+      clearTimersAndResetProgress();
     };
-  }, [clearLocalHoverTimer]);
+  }, [clearTimersAndResetProgress]);
 
-  const handleOptionClick = useCallback((optionId: string) => {
-    clearLocalHoverTimer();
+  const handleOptionClick = useCallback((clickedOptionId: string) => {
+    clearTimersAndResetProgress();
     onRequestHideDetail();
 
-    toggleOptionInStore(categoryTitle, optionId);
+    toggleOptionInStore(categoryTitle, clickedOptionId);
 
-    const currentSelections = useVariableSelectionStore.getState().getSelectedOptions(categoryTitle);
+    // Check if the clicked option is now selected and should trigger detail view timing
+    const currentSelections = useVariableSelectionStore.getState().getSelectedOptions(categoryTitle); // Get fresh state
+    const option = options.find(o => o.id === clickedOptionId);
+
+    if (option && currentSelections.has(clickedOptionId) && option.description) {
+      setActivelyHoveringOptionId(option.id); // Show progress bar in next render
+
+      // Start timer for detail view
+      const animationDuration = 1500; // Consistent with handleOptionMouseEnter and animation
+      // detailViewDelayTimerRef.current is already cleared by clearTimersAndResetProgress
+      detailViewDelayTimerRef.current = setTimeout(() => {
+        onRequestShowDetail(option);
+      }, animationDuration);
+    }
+
     if (onSelectionChange) {
       onSelectionChange(Array.from(currentSelections));
     }
-  }, [categoryTitle, onSelectionChange, onRequestHideDetail, toggleOptionInStore, clearLocalHoverTimer]);
+  }, [
+    categoryTitle,
+    options,
+    onSelectionChange,
+    onRequestHideDetail,
+    onRequestShowDetail,
+    toggleOptionInStore,
+    clearTimersAndResetProgress,
+    setActivelyHoveringOptionId,
+  ]);
 
   const handleOptionMouseEnter = useCallback((option: Option) => {
-    clearLocalHoverTimer();
+    clearTimersAndResetProgress();
+    setActivelyHoveringOptionId(option.id);
 
     const currentSelectedIds = selectedIdsFromStore;
     if (currentSelectedIds.has(option.id) && option.description) {
-      hoverTimerRef.current = setTimeout(() => {
+      const animationDuration = 1500;
+
+      detailViewDelayTimerRef.current = setTimeout(() => {
         onRequestShowDetail(option);
-      }, 1500);
+      }, animationDuration);
     }
-  }, [selectedIdsFromStore, onRequestShowDetail, clearLocalHoverTimer]);
+  }, [selectedIdsFromStore, onRequestShowDetail, clearTimersAndResetProgress]);
 
   const handleOptionMouseLeave = useCallback(() => {
-    clearLocalHoverTimer();
+    clearTimersAndResetProgress();
     onRequestHideDetail();
-  }, [onRequestHideDetail, clearLocalHoverTimer]);
+  }, [onRequestHideDetail, clearTimersAndResetProgress]);
 
   
   const baseButtonClasses = `
+    relative overflow-hidden isolate
     flex items-center justify-center gap-1.5 
     px-4 py-2 sm:px-4 sm:py-2 rounded-full
     border text-sm sm:text-sm font-medium 
@@ -109,6 +141,9 @@ export const VariableCategorySelect: React.FC<VariableCategorySelectProps> = ({
       <div className="flex flex-wrap gap-2 sm:gap-3">
         {options.map((option) => {
           const isSelected = selectedIdsFromStore.has(option.id);
+          const isBeingHoveredWithDescription = activelyHoveringOptionId === option.id && isSelected && option.description;
+          const animationDurationSeconds = 1.5;
+
           return (
             <button
               key={option.id}
@@ -122,12 +157,21 @@ export const VariableCategorySelect: React.FC<VariableCategorySelectProps> = ({
               `}
               aria-pressed={isSelected}
             >
-              <span>{option.label}</span>
-              <Gem size={14} className={isSelected ? selectedIconColor : unselectedIconColor} />
+              {isBeingHoveredWithDescription && (
+                <motion.div
+                  className="absolute top-0 left-0 h-full bg-lime-600/30 -z-10"
+                  initial={{ width: '0%' }}
+                  animate={{ width: '100%' }}
+                  transition={{ duration: animationDurationSeconds, ease: "linear" }}
+                  aria-hidden="true"
+                />
+              )}
+              <span className="relative z-10">{option.label}</span> 
+              <Gem size={14} className={`relative z-10 ${isSelected ? selectedIconColor : unselectedIconColor}`} />
               {isSelected ? (
-                <Check size={14} className={selectedIconColor} />
+                <Check size={14} className={`relative z-10 ${selectedIconColor}`} />
               ) : (
-                <Plus size={14} className={unselectedIconColor} />
+                <Plus size={14} className={`relative z-10 ${unselectedIconColor}`} />
               )}
             </button>
           );

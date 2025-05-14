@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils';
 import { useSidebarStore } from '../store/sidebarStore';
 import { UserProfile } from './UserProfile';
 import { useNavigate } from 'react-router-dom';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetFooter, SheetTrigger } from '@/components/ui/sheet';
 
 export interface SidebarMenuItem {
   key: string;
@@ -86,7 +86,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ menuItems }) => {
           />
         ))}
       </ul>
-      <UserProfile isEffectivelyExpanded={isMobile || storeExpanded} />
+      <SheetFooter>
+        <UserProfile isEffectivelyExpanded={isMobile || storeExpanded} />
+      </SheetFooter>
+      
     </nav>
   );
 
@@ -119,7 +122,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ menuItems }) => {
             <span className="text-white font-medium text-base truncate max-w-[120px]">{menuItems.find((item) => item.key === selectedMenu)?.label}</span>
           </Button>
         </SheetTrigger>
-        <SheetContent side="left" className="p-0 w-64 h-screen max-w-full left-0 top-0 rounded-none border-none shadow-xl md:hidden">
+        <SheetContent side="left" className="p-0 w-64 h-full max-w-full left-0 top-0 rounded-none border-none shadow-xl md:hidden">
           {sidebarContent(true)}
         </SheetContent>
       </Sheet>
